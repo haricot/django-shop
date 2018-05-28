@@ -227,6 +227,9 @@ class ProductRetrieveView(generics.RetrieveAPIView):
         except:
             raise
 
+    def get_context(self, request, **kwargs):
+        return request.path
+
     def get_template_names(self):
         product = self.get_object()
         app_label = product._meta.app_label.lower()
@@ -243,6 +246,42 @@ class ProductRetrieveView(generics.RetrieveAPIView):
             # add the product as Python object to the context
             renderer_context['product'] = self.get_object()
         return renderer_context
+
+    def get_renderer_context(self):
+        renderer_context = super(ProductRetrieveView, self).get_renderer_context()
+        if renderer_context['request'].accepted_renderer.format == 'html':
+            parentpage='/'.join(renderer_context['request'].path.split('/')[:-1]) + '/'
+            # add the product as Python object to the context
+            #renderer_context['product'] = self.get_object()
+            renderer_context['product'] = self.get_queryset()[1]
+            renderer_context['productnext'] = self.get_queryset()[2] if self.get_queryset()[2] is not None else None
+            renderer_context['productprev'] = self.get_queryset()[0] if self.get_queryset()[0] is not None else None
+        renderer_context['ddd']=renderer_context['request'].path.split('/')[:-1]
+        renderer_context['ddd']='/'.join(renderer_context['request'].path.split('/')[:-1]) + '/'
+        return renderer_context
+
+
+
+    def get_queryset(self, ):
+        assert self.lookup_url_kwarg in self.kwargs
+        filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_url_kwarg]}
+        qs = self.product_model.objects.filter(self.limit_choices_to,  active=True)
+        if hasattr(self.product_model, 'translations'):
+            language = get_language_from_request(self.request)
+            qs = qs.prefetch_related('translations').filter(translations__language_code=language)
+        qs = qs.select_related('polymorphic_ctype')
+        qs = CMSPagesFilterBackend().filter_queryset(self.request, qs, self)
+        previous_ = cur = next_ = None
+        objects=qs
+        l = len(list(qs))
+        for index, obj in enumerate(objects):
+            if obj.slug == filter_kwargs['slug']:
+                cur_=objects[index]
+                if index > 0:
+                    previous_ = objects[index - 1]
+                if index < (l - 1):
+                    next_ = objects[index + 1]
+        return previous_ , cur_, next_
 
     def get_object(self):
         if not hasattr(self, '_product'):
