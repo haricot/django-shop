@@ -178,9 +178,8 @@ if os.getenv('POSTGRES_DB') and os.getenv('POSTGRES_USER'):
 
 LANGUAGE_CODE = 'en'
 
-if 1==1:
+if SHOP_TUTORIAL in ['i18n_smartcard', 'i18n_commodity', 'i18n_polymorphic']:
 
-#if SHOP_TUTORIAL in ['i18n_smartcard', 'i18n_commodity', 'i18n_polymorphic']:
     USE_I18N = True
 
     LANGUAGES = (
@@ -191,7 +190,7 @@ if 1==1:
 
     )
 
-    PARLER_DEFAULT_LANGUAGE = 'fr'
+    PARLER_DEFAULT_LANGUAGE = 'en'
 
     PARLER_LANGUAGES = {
         1: (
@@ -219,16 +218,15 @@ if 1==1:
             'redirect_on_fallback': True,
         }, {
             'public': True,
-            'code': 'fr',
-            'hide_untranslated': False,
-            'name': 'french',
-            'redirect_on_fallback': True,
-        }, {
- 
-            'public': True,
             'code': 'de',
             'hide_untranslated': False,
             'name': 'Deutsch',
+            'redirect_on_fallback': True,
+        }, {
+            'public': True,
+            'code': 'fr',
+            'hide_untranslated': False,
+            'name': 'French',
             'redirect_on_fallback': True,
         },)
     }
@@ -520,8 +518,7 @@ CMSPLUGIN_CASCADE_PLUGINS = [
     'cmsplugin_cascade.leaflet',
     'cmsplugin_cascade.link',
     'cmsplugin_bs4forcascade.bootstrap4',
-        'shop.cascade',
-
+    'shop.cascade',
 ]
 
 CMSPLUGIN_CASCADE = {
@@ -627,14 +624,14 @@ HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'URL': 'http://{}:9200/'.format(ELASTICSEARCH_HOST),
-        'INDEX_NAME': 'myshop2-{}-en'.format(SHOP_TUTORIAL),
+        'INDEX_NAME': 'myshop-{}-en'.format(SHOP_TUTORIAL),
     },
 }
 if USE_I18N:
     HAYSTACK_CONNECTIONS['de'] = {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'URL': 'http://{}:9200/'.format(ELASTICSEARCH_HOST),
-        'INDEX_NAME': 'myshop2-{}-de'.format(SHOP_TUTORIAL),
+        'INDEX_NAME': 'myshop-{}-de'.format(SHOP_TUTORIAL),
     }
 
 HAYSTACK_ROUTERS = [
