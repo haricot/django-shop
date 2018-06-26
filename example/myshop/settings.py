@@ -179,15 +179,12 @@ if os.getenv('POSTGRES_DB') and os.getenv('POSTGRES_USER'):
 LANGUAGE_CODE = 'en'
 
 if SHOP_TUTORIAL in ['i18n_smartcard', 'i18n_commodity', 'i18n_polymorphic']:
-
     USE_I18N = True
 
     LANGUAGES = (
-        ('fr', "French"),
-
         ('en', "English"),
         ('de', "Deutsch"),
-
+        ('fr', "French"),
     )
 
     PARLER_DEFAULT_LANGUAGE = 'en'
