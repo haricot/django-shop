@@ -20,6 +20,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.6',
     'Framework :: Django :: 1.10',
     'Framework :: Django :: 1.11',
+    'Framework :: Django :: 2.1',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
 ]
@@ -40,7 +41,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Django>=1.11,<2.0',
+        'Django>=1.11,<2.2',
         'django-post_office>=3.2.0',
         'django-filer>=1.4',
         'django-ipware>=1.1.1',
@@ -48,11 +49,11 @@ setup(
         'django-fsm-admin>=1.2.4',
         'djangorestframework>3.8,<3.9',
         'django-angular>=2.2',
-        'Django-Select2<7',
+        'Django-Select2',
         'django-rest-auth>=0.9.1',
         'django-admin-sortable2>=0.6.19',
         'django-formtools>=1.0',
-        'djangocms-cascade>=0.18.2',
+        'djangocms-cascade @ git+ssh://git@github.com/jrief/djangocms-cascade.git@releases/1.0.x#egg=djangocms-cascade'
     ],
     # Note: this requires setuptools >= 18.0.
     extras_require={
