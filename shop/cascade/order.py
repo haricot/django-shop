@@ -21,7 +21,7 @@ from .extensions import ShopExtendableMixin, LeftRightExtensionMixin
 from .plugin_base import ShopPluginBase
 
 
-class ShopOrderViewsForm(forms.ModelForm):
+class ShopOrderViewsForm(EntangledModelFormMixin):
     def clean(self):
         cleaned_data = super(ShopOrderViewsForm, self).clean()
         if self.instance.page and self.instance.page.application_urls != 'OrderApp':
