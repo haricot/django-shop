@@ -27,6 +27,8 @@ from shop.conf import app_settings
 from shop.forms.base import DialogFormMixin
 from shop.models.cart import CartModel
 from shop.models.product import ProductModel
+from entangled.forms import EntangledModelFormMixin
+from django.forms.fields import CharField, BooleanField, Field
 
 
 class ShopPluginBase(CascadePluginBase):
@@ -57,8 +59,9 @@ class ShopLinkPluginBase(ShopPluginBase):
     def get_link(cls, obj):
         link = obj.glossary.get('link', {})
         if link.get('type') == 'cmspage':
-            if obj.link_model:
-                return obj.link_model.get_absolute_url()
+            # if not link required in some plugins with initialize_shop_demo in exemple
+            if hasattr(obj,'link_model'):
+                    return obj.link_model.get_absolute_url()
         else:
             # use the link type as special action keyword
             return link.get('type')
@@ -79,7 +82,7 @@ class ShopButtonPluginBase(ShopLinkPluginBase):
 
 
 class ProductSelect2Widget(HeavySelect2Widget):
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None, ):
         try:
             result = app_settings.PRODUCT_SELECT_SERIALIZER(ProductModel.objects.get(pk=value))
         except (ProductModel.DoesNotExist, ValueError):
@@ -125,6 +128,9 @@ class CatalogLinkForm(LinkForm):
         help_text=_("An internal link onto a product from the shop"),
     )
 
+    class Meta:
+        entangled_fields = {'glossary': ['product',]}
+
     def clean_product(self):
         if self.cleaned_data.get('link_type') == 'product':
             app_label = ProductModel._meta.app_label
@@ -148,7 +154,41 @@ class CatalogLinkPluginBase(LinkPluginBase):
     Alternative implementation to ``cmsplugin_cascade.link.DefaultLinkPluginBase`` which adds
     another link type, namely "Product", to set links onto arbitrary products of this shop.
     """
-    fields = (['link_type', 'cms_page', 'section', 'download_file', 'product', 'ext_url', 'mail_to'], 'glossary',)
+    LINK_TYPE_CHOICES = [
+        ('cmspage', _("CMS Page")),
+        ('product', _("Product")),
+        ('download', _("Download File")),
+        ('exturl', _("External URL")),
+        ('email', _("Mail To")),
+    ]
+
+    product = ProductSelectField(
+        label='',
+        required=False,
+        help_text=_("An internal link onto a product from the shop"),
+    )
+
+    class Meta:
+        entangled_fields = {'glossary': ['product',]}
+
+    def clean_product(self):
+        print(self.cleaned_data.get('link_type'))
+        if self.cleaned_data.get('link_type') == 'product':
+            app_label = ProductModel._meta.app_label
+            self.cleaned_data['link_data'] = {
+                'type': 'product',
+                'model': '{0}.{1}'.format(app_label, ProductModel.__name__),
+                'pk': self.cleaned_data['product'],
+            }
+
+    def set_initial_product(self, initial):
+        try:
+            # check if that product still exists, otherwise return nothing
+            Model = apps.get_model(*initial['link']['model'].split('.'))
+            initial['product'] = Model.objects.get(pk=initial['link']['pk']).pk
+        except (KeyError, ValueError, ObjectDoesNotExist):
+            pass
+
     ring_plugin = 'ShopLinkPlugin'
 
     class Media:
@@ -164,19 +204,23 @@ class DialogFormPluginBase(ShopPluginBase):
         'SegmentPlugin', 'SimpleWrapperPlugin', 'ValidateSetOfFormsPlugin')
     RENDER_CHOICES = [('form', _("Form dialog")), ('summary', _("Static summary"))]
 
-    render_type = GlossaryField(
-        widgets.RadioSelect(choices=RENDER_CHOICES),
+    render_type = ChoiceField(
         label=_("Render as"),
+        choices=RENDER_CHOICES,
+        widget=widgets.RadioSelect,
         initial='form',
         help_text=_("A dialog can also be rendered as a box containing a read-only summary."),
     )
 
-    headline_legend = GlossaryField(
-        widgets.CheckboxInput(),
+    headline_legend = BooleanField(
+        required=False,
         label=_("Headline Legend"),
         initial=True,
         help_text=_("Render a legend inside the dialog's headline."),
     )
+
+    class Meta:
+        entangled_fields = {'glossary': ['render_type', 'headline_legend']}
 
     @classmethod
     def register_plugin(cls, plugin):
@@ -212,13 +256,14 @@ class DialogFormPluginBase(ShopPluginBase):
          * or `initial` - a dictionary containing initial form data, or if both are set, values
            from `initial` override those of `instance`.
         """
-        if issubclass(self.get_form_class(instance), DialogFormMixin):
-            try:
-                cart = CartModel.objects.get_from_request(context['request'])
-                cart.update(context['request'])
-            except CartModel.DoesNotExist:
-                cart = None
-            return {'cart': cart}
+        # if issubclass(self.get_form_class(instance), DialogFormMixin):
+        #    print(CartModel.objects.get_from_request(context['request']))
+        try:
+            cart = CartModel.objects.get_from_request(context['request'])
+            cart.update(context['request'])
+        except CartModel.DoesNotExist:
+            cart = None
+        return {'cart': cart}
         return {}
 
     def get_render_template(self, context, instance, placeholder):
