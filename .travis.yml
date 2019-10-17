@@ -8,7 +8,9 @@ python:
 env:
   - DJANGOVER=django110
   - DJANGOVER=django111
-
+  - DJANGOVER=django21
+  - DJANGOVER=django22
+  
 install:
   - pip install tox
 
@@ -17,3 +19,5 @@ script:
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' && $DJANGOVER ]]; then export TOX_ENV=py35-$DJANGOVER; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' && $DJANGOVER ]]; then export TOX_ENV=py36-$DJANGOVER; fi"
   - tox --recreate -e "$TOX_ENV"
+
+cache: pip
