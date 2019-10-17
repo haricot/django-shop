@@ -44,7 +44,7 @@ def create_deferred_class(name, base, fields={}, meta={}, mixins=()):
 
 
 RegularUser = create_regular_class('RegularUser')
-DeferredBaseUser = create_deferred_base_class('DeferredBaseUser')
+DeferredBaseUser = create_deferred_base_class('DeferredBaseUser', on_delete=models.CASCADE)
 DeferredUser = create_deferred_class('DeferredUser', DeferredBaseUser)
 
 
