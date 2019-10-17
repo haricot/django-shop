@@ -40,7 +40,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Django>=1.11,<2.0',
+        'Django>=1.11,<3',
         'django-post_office>=3.2.0',
         'django-filer>=1.4',
         'django-ipware>=1.1.1',
@@ -52,7 +52,7 @@ setup(
         'django-rest-auth>=0.9.1',
         'django-admin-sortable2>=0.6.19',
         'django-formtools>=1.0',
-        'djangocms-cascade>=0.18.2',
+        'djangocms-cascade>=1.1.1',
     ],
     # Note: this requires setuptools >= 18.0.
     extras_require={
