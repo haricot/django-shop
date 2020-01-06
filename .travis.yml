@@ -3,7 +3,12 @@ dist: xenial
 language: python
 
 python:
-  - 3.7
+  - 3.6
+
+matrix:
+  include:
+    - python: 3.6
+      env: TOXENV=py36-django22 
 
 env:
   - DJANGOVER=django22
@@ -12,7 +17,4 @@ install:
   - pip install tox
 
 script:
-  - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' && $DJANGOVER ]]; then export TOX_ENV=py35-$DJANGOVER; fi"
-  - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' && $DJANGOVER ]]; then export TOX_ENV=py36-$DJANGOVER; fi"
-  - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' && $DJANGOVER ]]; then export TOX_ENV=py37-$DJANGOVER; fi"
-  - PYTHONPATH=$(pwd) DATABASE_URL="sqlite:///:memory:" tox -r -e "$TOX_ENV"
+  - tox  
