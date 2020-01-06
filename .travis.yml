@@ -15,4 +15,4 @@ script:
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' && $DJANGOVER ]]; then export TOX_ENV=py35-$DJANGOVER; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.6' && $DJANGOVER ]]; then export TOX_ENV=py36-$DJANGOVER; fi"
   - "if [[ $TRAVIS_PYTHON_VERSION == '3.7' && $DJANGOVER ]]; then export TOX_ENV=py37-$DJANGOVER; fi"
-  - tox -r -e "$TOX_ENV"
+  - PYTHONPATH=$(pwd) DATABASE_URL="sqlite:///:memory:" tox -r -e "$TOX_ENV"
