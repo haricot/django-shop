@@ -15,6 +15,7 @@ env:
 
 install:
   - pip install tox
+  - pip install pytest
 
 script:
-  - pytest 
+  - pytest
