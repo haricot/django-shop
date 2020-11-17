@@ -37,7 +37,7 @@
     "leaflet-easybutton": "^2.2.0",
     "picturefill": "~3.0.2",
     "postcss": "^6.0.17",
-    "postcss-cli": "^5.0.0",
+    "postcss-cli": "^8.0.0",
     "select2": "~4.0.3"
   }
 }
