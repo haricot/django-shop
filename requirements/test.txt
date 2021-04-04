@@ -12,3 +12,5 @@ stripe==1.53.0
 djangoshop-stripe<0.13
 pluggy==0.5.2
 py==1.4.30
+djangorestframework>=3.11.2 # not directly required, pinned by Snyk to avoid a vulnerability
+pillow>=8.2.0 # not directly required, pinned by Snyk to avoid a vulnerability
